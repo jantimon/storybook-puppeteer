@@ -21,5 +21,9 @@ module.exports = {
   externals: {
     // Keep PeerDependencies out of the bundle
     puppeteer: 'require("puppeteer")'
-  }
+  },
+  stats: {
+    // Ignore warnings due to yarg's dynamic module loading
+    warningsFilter: [/node_modules\/yargs/, /node_modules\/express/]
+  },
 };

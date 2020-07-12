@@ -1,31 +1,27 @@
+import express from "express";
 import yargs = require("yargs");
 import globToRegExp from "glob-to-regexp";
 import chalk from "chalk";
-import puppeteer, { Browser, Page } from "puppeteer";
+import puppeteer, { Browser, Page, errors } from "puppeteer";
+import "express";
 import { getStories, assertStoryHasNoErrors, DEFAULT_BASE_URL } from "./lib";
 const checknark = chalk.greenBright("✓");
 const fail = chalk.red("x");
 
-// Parse command line options
-const {
-  d: waitDuration,
-  w: maxWorkers,
-  b: bail,
-  u: baseUrl,
-  s: waitForSelector,
-  t: timeout,
-  e: exclude,
-  o: only,
-} = {
-  d: 200,
-  w: 5,
-  b: false,
-  u: DEFAULT_BASE_URL,
-  s: "#root *",
-  t: 5000,
-  e: [],
-  o: [],
-  ...yargs
+function getCliOptions() {
+  // Parse command line options
+  const {
+    d: waitDuration,
+    w: maxWorkers,
+    b: bail,
+    u: baseUrl,
+    s: waitForSelector,
+    t: timeout,
+    e: exclude,
+    o: only,
+    serveDirectory,
+    servePort,
+  } = yargs
     .usage("Usage: $0 [options]")
     .alias("t", "timeout")
     .nargs("t", 1)
@@ -64,26 +60,88 @@ const {
     .describe(
       "o",
       'Run only the stories e.g. -o "base-intro" or -o "demo-*". Can be used multiple times'
-    ).argv,
-};
+    )
+    .describe(
+      "serveDirectory",
+      "Serves the directory of a static storybook build"
+    )
+    .describe("servePort", "The port used for serveDirectory").argv as Partial<{
+    d: string;
+    w: string;
+    b: boolean;
+    u: string;
+    s: string;
+    t: string;
+    e: string[];
+    o: string[];
+    serveDirectory: string;
+    servePort: string;
+  }>;
 
-const excludeRegularExpressions = (exclude || []).map((exclusion) =>
-  globToRegExp(String(exclusion), { extended: true })
-);
-const onlyRegularExpressions = (only || []).map((exclusion) =>
-  globToRegExp(String(exclusion), { extended: true })
-);
+  const excludeRegularExpressions = (exclude || []).map((exclusion) =>
+    globToRegExp(String(exclusion), { extended: true })
+  );
+  const onlyRegularExpressions = (only || []).map((inclusion) =>
+    globToRegExp(String(inclusion), { extended: true })
+  );
+
+  const toNumer = (val: string | undefined) =>
+    typeof val === "string" && val !== "" ? Number(val) : undefined;
+
+  const cliOptions = {
+    waitDuration: toNumer(waitDuration) || 200,
+    maxWorkers: toNumer(maxWorkers) || 5,
+    bail: !!bail,
+    baseUrl,
+    waitForSelector: waitForSelector || "#root *",
+    timeout: toNumer(timeout) || 5000,
+    excludeRegularExpressions,
+    onlyRegularExpressions,
+    serveDirectory,
+    servePort: toNumer(servePort) || 6011,
+  };
+
+  if (serveDirectory && !baseUrl) {
+    cliOptions.baseUrl = `http://localhost:${cliOptions.servePort}/`;
+  }
+
+  return {
+    baseUrl: DEFAULT_BASE_URL,
+    ...cliOptions,
+  };
+}
+
+const cliOptions = getCliOptions();
 
 async function main(pages: Page[]) {
   console.log("Launching " + require("../package.json").name);
-  const allStories = await getStories(pages[0], baseUrl);
+
+  let tearDownServer = () => {};
+  if (cliOptions.serveDirectory) {
+    console.log(" starting server on port " + cliOptions.servePort);
+    tearDownServer = await launchExpressServer(cliOptions.serveDirectory, cliOptions.servePort);
+  }
+
+  const storiesPromise = getStories(pages[0], cliOptions.baseUrl);
+  // Output launch errors
+  try {
+    await storiesPromise;
+  } catch (e) {
+    console.log(chalk.red(e.message));
+    process.exit(1);
+  }
+  const allStories = await storiesPromise;
 
   // exclude / include stories based on cli arguments
   const stories = allStories.filter(
     (story) =>
-      !excludeRegularExpressions.some((regExp) => regExp.test(story.id)) &&
-      (onlyRegularExpressions.length === 0 ||
-        onlyRegularExpressions.some((regExp) => regExp.test(story.id)))
+      !cliOptions.excludeRegularExpressions.some((regExp) =>
+        regExp.test(story.id)
+      ) &&
+      (cliOptions.onlyRegularExpressions.length === 0 ||
+        cliOptions.onlyRegularExpressions.some((regExp) =>
+          regExp.test(story.id)
+        ))
   );
 
   console.log(
@@ -92,8 +150,10 @@ async function main(pages: Page[]) {
     } ${stories.length === 1 ? "story" : "stories"} found.`
   );
 
+  console.log(` starting up ${pages.length} workers`);
   const errors = await testStories(pages, stories);
-
+  tearDownServer();
+  
   if (errors) {
     console.log(
       chalk.red(
@@ -141,11 +201,13 @@ async function testStories(
       errors++;
       console.log(` ${fail} ${story.kind} - ${story.name}`);
       console.log(
-        `   ${chalk.underline.blue(baseUrl + "iframe.html?id=" + story.id)}`
+        `   ${chalk.underline.blue(
+          cliOptions.baseUrl + "iframe.html?id=" + story.id
+        )}`
       );
       console.log("   " + testError.toString());
       console.log("\n");
-      if (bail) {
+      if (cliOptions.bail) {
         process.exit(1);
       }
     } else {
@@ -171,11 +233,19 @@ async function testStory(
   await assertStoryHasNoErrors(
     page,
     id,
-    baseUrl,
-    timeout,
-    waitDuration,
-    waitForSelector
+    cliOptions.baseUrl,
+    cliOptions.timeout,
+    cliOptions.waitDuration,
+    cliOptions.waitForSelector
   );
+}
+
+function launchExpressServer(directory: string, port: number) {
+  return new Promise<() => void>((resolve, reject) => {
+    const app = express();
+    app.use(express.static(directory));
+    let server = app.listen(port, (error: any) => error ? reject(error) : resolve(() => server.close()));
+  })
 }
 
 // Start
@@ -183,7 +253,7 @@ puppeteer.launch().then(async (browser) => {
   // Generate a tab per worker
   // Use min 1 worker and max 15 workers
   const pages = await Promise.all(
-    Array(Math.min(Math.max(1, maxWorkers), 15))
+    Array(Math.min(Math.max(1, cliOptions.maxWorkers || 1), 15))
       .fill("")
       .map(() => browser.newPage())
   );
@@ -194,4 +264,5 @@ puppeteer.launch().then(async (browser) => {
     throw e;
   }
   await browser.close();
+  process.exit();
 });

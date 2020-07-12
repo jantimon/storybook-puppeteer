@@ -20,10 +20,13 @@
   "author": "Jan Nicklas",
   "license": "MIT",
   "devDependencies": {
+    "@types/glob-to-regexp": "0.4.0",
+    "@types/express": "4.17.7",
     "@types/node": "14.0.22",
     "@types/puppeteer": "3.0.1",
     "@types/yargs": "15.0.5",
     "chalk": "4.1.0",
+    "express": "4.17.1",
     "glob-to-regexp": "0.4.1",
     "puppeteer": "5.0.0",
     "ts-config-webpack-plugin": "2.0.0",
@@ -34,8 +37,5 @@
   },
   "peerDependencies": {
     "puppeteer": "^5.0.0"
-  },
-  "dependencies": {
-    "@types/glob-to-regexp": "0.4.0"
   }
 }
