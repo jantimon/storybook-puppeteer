@@ -1,0 +1,41 @@
+{
+  "name": "storybook-puppeteer",
+  "version": "1.0.0",
+  "description": "Execute all storybook stories using puppeteer to check for runtime exceptions",
+  "main": "index.js",
+  "scripts": {
+    "prepublishOnly": "npm run build",
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch",
+    "release": "standard-version"
+  },
+  "keywords": [
+    "storybook",
+    "puppeteer"
+  ],
+  "files": [
+    "bin/main.js"
+  ],
+  "bin": "bin/main.js",
+  "author": "Jan Nicklas",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "14.0.22",
+    "@types/puppeteer": "3.0.1",
+    "@types/yargs": "15.0.5",
+    "chalk": "4.1.0",
+    "glob-to-regexp": "0.4.1",
+    "puppeteer": "5.0.0",
+    "ts-config-webpack-plugin": "2.0.0",
+    "typescript": "3.9.6",
+    "webpack": "4.43.0",
+    "webpack-cli": "3.3.12",
+    "yargs": "15.4.1"
+  },
+  "peerDependencies": {
+    "puppeteer": "^5.0.0"
+  },
+  "dependencies": {
+    "@types/glob-to-regexp": "0.4.0"
+  }
+}
