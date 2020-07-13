@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/jantimon/storybook-puppeteer/compare/v1.1.0...v1.2.0) (2020-07-13)
+
+
+### Features
+
+* launch headless ([cee37ed](https://github.com/jantimon/storybook-puppeteer/commit/cee37edf79d54d4f910dfa088520123d784567d8))
+
 ## [1.1.0](https://github.com/jantimon/storybook-puppeteer/compare/v1.0.0...v1.1.0) (2020-07-12)
 
 
