@@ -249,7 +249,13 @@ function launchExpressServer(directory: string, port: number) {
 }
 
 // Start
-puppeteer.launch().then(async (browser) => {
+puppeteer.launch({
+  headless: true,
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+  ]
+}).then(async (browser) => {
   // Generate a tab per worker
   // Use min 1 worker and max 15 workers
   const pages = await Promise.all(
