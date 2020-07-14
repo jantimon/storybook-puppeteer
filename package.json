@@ -24,6 +24,7 @@
     "@types/glob-to-regexp": "0.4.0",
     "@types/node": "14.0.22",
     "@types/puppeteer": "3.0.1",
+    "@types/webpack-env": "1.15.2",
     "@types/yargs": "15.0.5",
     "chalk": "4.1.0",
     "express": "4.17.1",
@@ -36,7 +37,7 @@
     "webpack-cli": "3.3.12",
     "yargs": "15.4.1"
   },
-  "peerDependencies": {
+  "optionalDependencies": {
     "puppeteer": "^5.0.0"
   }
 }

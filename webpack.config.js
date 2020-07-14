@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const TsConfigWebpackPlugin = require('ts-config-webpack-plugin');
 
 module.exports = {
+  devtool: false,
   target: 'node',
   output: {
     path: __dirname + '/bin'
@@ -20,7 +21,11 @@ module.exports = {
   ],
   externals: {
     // Keep PeerDependencies out of the bundle
-    puppeteer: 'require("puppeteer")'
+    puppeteer: 'require("puppeteer")',
+    npm: 'require("npm")',
+  },
+  node: {
+    __dirname: false
   },
   stats: {
     // Ignore warnings due to yarg's dynamic module loading

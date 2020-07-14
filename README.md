@@ -16,17 +16,18 @@ If you are using a modern stack which allows using jest please concider using Je
 
 ## Getting started
 
-`storybook-puppeteer` has 0 dependencies however it relies on puppeteer to be installed as a peer dependency.
+`storybook-puppeteer` has 0 dependencies however it relies on puppeteer to be installed as a peer dependency.  
+If puppeteer is not installed it will be installed during execution.
 
 NPM 
 
 ```bash
-npm i --save-dev puppeteer storybook-puppeteer
+npm i --save-dev storybook-puppeteer
 npx storybook-puppeteer
 ```
 
 ```bash
-yarn add --dev puppeteer storybook-puppeteer
+yarn add --dev storybook-puppeteer
 yarn storybook-puppeteer
 ```
 
@@ -52,6 +53,9 @@ Options:
                          Can be used multiple times                      [array]
   -o, --only             Run only the stories e.g. -o "base-intro" or -o
                          "demo-*". Can be used multiple times            [array]
+  --serveDirectory       Serves the directory of a static storybook build
+  --servePort            The port used for serveDirectory
+  --autoInstall          Install puppeteer if missing - true by default
 ```
 
 ## License

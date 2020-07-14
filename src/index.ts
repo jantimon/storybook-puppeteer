@@ -2,7 +2,9 @@ import express from "express";
 import yargs = require("yargs");
 import globToRegExp from "glob-to-regexp";
 import chalk from "chalk";
-import puppeteer, { Browser, Page, errors } from "puppeteer";
+import { Page } from "puppeteer";
+import path from 'path';
+import { execSync } from 'child_process';
 import "express";
 import { getStories, assertStoryHasNoErrors, DEFAULT_BASE_URL } from "./lib";
 const checknark = chalk.greenBright("✓");
@@ -19,6 +21,7 @@ function getCliOptions() {
     t: timeout,
     e: exclude,
     o: only,
+    autoInstall,
     serveDirectory,
     servePort,
   } = yargs
@@ -65,7 +68,13 @@ function getCliOptions() {
       "serveDirectory",
       "Serves the directory of a static storybook build"
     )
-    .describe("servePort", "The port used for serveDirectory").argv as Partial<{
+    .describe("servePort", "The port used for serveDirectory")
+    .nargs("autoInstall", 1)
+    .describe(
+      "autoInstall",
+      "Install puppeteer if missing - true by default"
+    )
+    .argv as Partial<{
     d: string;
     w: string;
     b: boolean;
@@ -74,6 +83,7 @@ function getCliOptions() {
     t: string;
     e: string[];
     o: string[];
+    autoInstall: string;
     serveDirectory: string;
     servePort: string;
   }>;
@@ -99,6 +109,7 @@ function getCliOptions() {
     onlyRegularExpressions,
     serveDirectory,
     servePort: toNumer(servePort) || 6011,
+    autoInstall: autoInstall !== 'false'
   };
 
   if (serveDirectory && !baseUrl) {
@@ -114,11 +125,11 @@ function getCliOptions() {
 const cliOptions = getCliOptions();
 
 async function main(pages: Page[]) {
-  console.log("Launching " + require("../package.json").name);
+  console.log("🚀 Launching " + require("../package.json").name);
 
   let tearDownServer = () => {};
   if (cliOptions.serveDirectory) {
-    console.log(" starting server on port " + cliOptions.servePort);
+    console.log("🌐 Starting server on port " + chalk.blue(cliOptions.servePort));
     tearDownServer = await launchExpressServer(cliOptions.serveDirectory, cliOptions.servePort);
   }
 
@@ -127,6 +138,7 @@ async function main(pages: Page[]) {
   try {
     await storiesPromise;
   } catch (e) {
+    console.log(`${fail} Could not find any stories${(cliOptions.baseUrl ? ` for ${chalk.grey(cliOptions.baseUrl)}` : '')}. Is your storybook server running?`);
     console.log(chalk.red(e.message));
     process.exit(1);
   }
@@ -248,7 +260,30 @@ function launchExpressServer(directory: string, port: number) {
   })
 }
 
+function isPuppeteerInstalled() {
+  try {
+    execSync('node -e \'require("puppeteer")\'', {cwd: __dirname});
+  } catch(e) {
+    return false;
+  }
+  return true;
+}
+
+function installPuppeteer() {
+  console.log('🚚 install puppeteer')
+  const binaryLocationParts = __dirname.split(path.sep);
+  const installLocation = (binaryLocationParts[binaryLocationParts.length - 2] === 'node_modules' ? binaryLocationParts.slice(0, -3) : binaryLocationParts.slice(0, -1)).join(path.sep);
+  console.log(execSync('npm install puppeteer --no-save', {
+    cwd: installLocation
+  }).toString());
+}
+
+
 // Start
+if (!isPuppeteerInstalled() && cliOptions.autoInstall) {
+  installPuppeteer();
+}
+const puppeteer = __non_webpack_require__('puppeteer') as typeof import('puppeteer');
 puppeteer.launch({
   headless: true,
   args: [
