@@ -131,12 +131,13 @@ async function main(pages: Page[]) {
     tearDownServer = await launchExpressServer(cliOptions.serveDirectory, cliOptions.servePort);
   }
 
+  console.log("   Test stories on " + chalk.underline.blue(cliOptions.baseUrl));
   const storiesPromise = getStories(pages[0], cliOptions.baseUrl);
   // Output launch errors
   try {
     await storiesPromise;
   } catch (e) {
-    console.log(`${fail} Could not find any stories${(cliOptions.baseUrl ? ` for ${chalk.grey(cliOptions.baseUrl)}` : '')}. Is your storybook server running?`);
+    console.log(`${fail} Could not find any stories$ for ${chalk.grey(cliOptions.baseUrl)}. Is your storybook server running?`);
     console.log(chalk.red(e.message));
     process.exit(1);
   }
