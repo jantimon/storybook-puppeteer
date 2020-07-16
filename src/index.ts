@@ -102,7 +102,7 @@ function getCliOptions() {
     waitDuration: toNumer(waitDuration) || 200,
     maxWorkers: toNumer(maxWorkers) || 5,
     bail: !!bail,
-    baseUrl,
+    baseUrl: baseUrl || DEFAULT_BASE_URL,
     waitForSelector: waitForSelector || "#root *",
     timeout: toNumer(timeout) || 5000,
     excludeRegularExpressions,
@@ -112,14 +112,12 @@ function getCliOptions() {
     autoInstall: autoInstall !== 'false'
   };
 
+  // Proivde a different baseUrl default value if serveDirectory option is set
   if (serveDirectory && !baseUrl) {
     cliOptions.baseUrl = `http://localhost:${cliOptions.servePort}/`;
   }
 
-  return {
-    baseUrl: DEFAULT_BASE_URL,
-    ...cliOptions,
-  };
+  return cliOptions;
 }
 
 const cliOptions = getCliOptions();
