@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/jantimon/storybook-puppeteer/compare/v1.4.0...v1.5.0) (2020-07-31)
+
+
+### Features
+
+* remove puppeteer as optional dependency ([3a5aada](https://github.com/jantimon/storybook-puppeteer/commit/3a5aada61f9a08b70a1c2837c3103492c9b7bbc5))
+
 ## [1.4.0](https://github.com/jantimon/storybook-puppeteer/compare/v1.3.1...v1.4.0) (2020-07-16)
 
 
