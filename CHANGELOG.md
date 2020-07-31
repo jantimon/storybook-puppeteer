@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.1](https://github.com/jantimon/storybook-puppeteer/compare/v1.5.0...v1.5.1) (2020-07-31)
+
+
+### Bug Fixes
+
+* hide error messages during puppeteer avaiability check ([f1d6864](https://github.com/jantimon/storybook-puppeteer/commit/f1d6864c5c7bb75035464e0674cd4cd06c1eb25c))
+
 ## [1.5.0](https://github.com/jantimon/storybook-puppeteer/compare/v1.4.0...v1.5.0) (2020-07-31)
 
 
