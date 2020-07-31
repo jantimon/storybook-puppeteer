@@ -261,7 +261,7 @@ function launchExpressServer(directory: string, port: number) {
 
 function isPuppeteerInstalled() {
   try {
-    execSync('node -e \'require("puppeteer")\'', {cwd: __dirname});
+    execSync('node -e \'require("puppeteer")\'', {cwd: __dirname, stdio: ['pipe', 'pipe', 'ignore']});
   } catch(e) {
     return false;
   }

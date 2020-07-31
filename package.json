@@ -30,7 +30,7 @@
     "express": "4.17.1",
     "glob-to-regexp": "0.4.1",
     "puppeteer": "5.0.0",
-    "standard-version": "8.0.1",
+    "standard-version": "8.0.2",
     "ts-config-webpack-plugin": "2.0.0",
     "typescript": "3.9.6",
     "webpack": "4.43.0",
