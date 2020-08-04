@@ -204,7 +204,7 @@ async function testStories(
     }
     let testError: Error | undefined;
     try {
-      await testStory(page, story);
+      await testStory(page, story.id);
     } catch (err) {
       testError = err;
     }
@@ -239,16 +239,27 @@ async function testStories(
 
 async function testStory(
   page: Page,
-  { id, name }: { id: string; name: string }
+  id: string,
+  retries: number = 3
 ) {
-  await assertStoryHasNoErrors(
-    page,
-    id,
-    cliOptions.baseUrl,
-    cliOptions.timeout,
-    cliOptions.waitDuration,
-    cliOptions.waitForSelector
-  );
+  try {
+    await assertStoryHasNoErrors(
+      page,
+      id,
+      cliOptions.baseUrl,
+      cliOptions.timeout,
+      cliOptions.waitDuration,
+      cliOptions.waitForSelector
+    );
+  } catch(e) {
+    // Ignore the error and retry to test the story
+    if (retries) {
+      testStory(page, id, retries -1);
+    } else {
+      // Rethrow the error if no more retries are possible
+      throw e;
+    }
+  }
 }
 
 function launchExpressServer(directory: string, port: number) {
