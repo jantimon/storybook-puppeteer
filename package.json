@@ -1,6 +1,6 @@
 {
   "name": "storybook-puppeteer",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Execute all storybook stories using puppeteer to check for runtime exceptions",
   "main": "index.js",
   "scripts": {
