@@ -254,7 +254,7 @@ async function testStory(
   } catch(e) {
     // Ignore the error and retry to test the story
     if (retries) {
-      testStory(page, id, retries -1);
+      await testStory(page, id, retries -1);
     } else {
       // Rethrow the error if no more retries are possible
       throw e;
