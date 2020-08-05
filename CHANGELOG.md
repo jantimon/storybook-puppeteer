@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/jantimon/storybook-puppeteer/compare/v1.6.1...v1.7.0) (2020-08-05)
+
+
+### Features
+
+* use emotjis for ✅ and ❌ ([80f960f](https://github.com/jantimon/storybook-puppeteer/commit/80f960f1f1e25eac3521e1accc7b9b0604c98290))
+
 ### [1.6.1](https://github.com/jantimon/storybook-puppeteer/compare/v1.6.0...v1.6.1) (2020-08-05)
 
 
