@@ -7,8 +7,8 @@ import path from 'path';
 import { execSync } from 'child_process';
 import "express";
 import { getStories, assertStoryHasNoErrors, DEFAULT_BASE_URL } from "./lib";
-const checknark = chalk.greenBright("✓");
-const fail = chalk.red("x");
+const checknark = chalk.greenBright("✅");
+const fail = chalk.red("❌");
 
 function getCliOptions() {
   // Parse command line options
