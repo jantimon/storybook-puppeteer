@@ -5,11 +5,20 @@ const sleep = (duration: number) =>
 
 export const DEFAULT_BASE_URL = "http://localhost:6009/";
 
-declare var __STORYBOOK_STORY_STORE__: {
-  getStoriesForManager(): {
-    [key: string]: { id: string; kind: string; name: string };
-  };
-};
+declare var __STORYBOOK_STORY_STORE__: // Storybook 5
+| {
+      getStoriesForManager(): {
+        [key: string]: { id: string; kind: string; name: string };
+      };
+    }
+  // Storybook 6
+  | {
+      getStoriesJsonData(): {
+        stories: {
+          [key: string]: { id: string; kind: string; name: string };
+        };
+      };
+    };
 
 export async function getStories(
   page: Page,
@@ -20,7 +29,10 @@ export async function getStories(
   await waitForGlobaLVariable(page, "__STORYBOOK_STORY_STORE__");
   // Return stories
   return await page.evaluate(() => {
-    const stories = __STORYBOOK_STORY_STORE__.getStoriesForManager();
+    const stories =
+      "getStoriesJsonData" in __STORYBOOK_STORY_STORE__
+        ? __STORYBOOK_STORY_STORE__.getStoriesJsonData().stories
+        : __STORYBOOK_STORY_STORE__.getStoriesForManager();
     return Object.keys(stories).map((storyId) => {
       const { id, kind, name } = stories[storyId];
       return { id, kind, name };
@@ -43,16 +55,19 @@ export async function assertStoryHasNoErrors(
   page.on("pageerror", handleError);
 
   try {
-    await page.goto(`${baseUrl}iframe.html?id=${id}`, { waitUntil: "load", timeout });
+    await page.goto(`${baseUrl}iframe.html?id=${id}`, {
+      waitUntil: "load",
+      timeout,
+    });
     await waitForGlobaLVariable(page, "__STORYBOOK_STORY_STORE__");
     await sleep(waitForDuration);
     if (waitForSelector) {
       await page.waitForSelector(waitForSelector, {
-        timeout
+        timeout,
       });
     }
   } catch (e) {
-    page.off("pageerror", handleError);   
+    page.off("pageerror", handleError);
     if (errors.length) {
       throw errors[0];
     }
