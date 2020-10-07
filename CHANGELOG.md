@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/jantimon/storybook-puppeteer/compare/v1.7.0...v1.8.0) (2020-10-07)
+
+
+### Features
+
+* add support for storybook 6 ([c497ba8](https://github.com/jantimon/storybook-puppeteer/commit/c497ba80f9adfc5e84ef6870becde0ca1f5c7a05))
+
 ## [1.7.0](https://github.com/jantimon/storybook-puppeteer/compare/v1.6.1...v1.7.0) (2020-08-05)
 
 
