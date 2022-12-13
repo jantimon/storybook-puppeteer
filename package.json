@@ -27,7 +27,7 @@
     "@types/webpack-env": "1.15.2",
     "@types/yargs": "15.0.5",
     "chalk": "4.1.0",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "glob-to-regexp": "0.4.1",
     "puppeteer": "5.0.0",
     "standard-version": "8.0.2",
